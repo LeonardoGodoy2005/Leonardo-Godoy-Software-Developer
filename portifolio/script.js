@@ -1,94 +1,229 @@
+/* ========================================
+   CURSOR
+======================================== */
 
-// ================================
-// HEADER AO ROLAR A PÁGINA
-// ================================
+const cursor = document.querySelector(".cursor");
+const cursorRing = document.querySelector(".cursor-ring");
 
-const header = document.querySelector(".header");
+document.addEventListener("mousemove", (event) => {
 
-window.addEventListener("scroll", () => {
-    if (window.scrollY > 50) {
-        header.classList.add("scrolled");
-    } else {
-        header.classList.remove("scrolled");
-    }
+    cursor.style.left = `${event.clientX}px`;
+    cursor.style.top = `${event.clientY}px`;
+
+    cursorRing.style.left = `${event.clientX}px`;
+    cursorRing.style.top = `${event.clientY}px`;
+
 });
 
 
-// ================================
-// ANIMAÇÃO DAS SEÇÕES
-// ================================
+/* ========================================
+   CURSOR HOVER
+======================================== */
 
-const elements = document.querySelectorAll(
-    ".section-title, .about-content, .skill, .service-card, .project-card, .contact-card"
+const interactiveElements = document.querySelectorAll(
+    "a, button, .project-image, .skill-row, .service"
 );
+
+interactiveElements.forEach((element) => {
+
+    element.addEventListener("mouseenter", () => {
+
+        cursorRing.style.width = "65px";
+        cursorRing.style.height = "65px";
+        cursorRing.style.borderColor = "#8b5cf6";
+
+    });
+
+    element.addEventListener("mouseleave", () => {
+
+        cursorRing.style.width = "35px";
+        cursorRing.style.height = "35px";
+        cursorRing.style.borderColor =
+            "rgba(255,255,255,0.5)";
+
+    });
+
+});
+
+
+/* ========================================
+   REVEAL NO SCROLL
+======================================== */
+
+const revealElements = document.querySelectorAll(
+    ".section-number, .eyebrow, .intro h2, .intro-text, .project, .skill-row, .service, .contact-main, .contact-link"
+);
+
+revealElements.forEach((element) => {
+    element.classList.add("reveal");
+});
+
 
 const observer = new IntersectionObserver(
     (entries) => {
+
         entries.forEach((entry) => {
+
             if (entry.isIntersecting) {
-                entry.target.classList.add("show");
+
+                entry.target.classList.add("active");
+
+                observer.unobserve(entry.target);
+
             }
+
         });
+
     },
     {
-        threshold: 0.15
+        threshold: 0.12
     }
 );
 
-elements.forEach((element) => {
-    element.classList.add("hidden");
+
+revealElements.forEach((element) => {
     observer.observe(element);
 });
 
-// ================================
-// ANIMAÇÃO DOS PROJETOS
-// ================================
 
-const projectCards = document.querySelectorAll(".project-card");
+/* ========================================
+   PARALLAX DA FOTO
+======================================== */
 
-projectCards.forEach((card, index) => {
-    card.style.transitionDelay = `${index * 0.1}s`;
-});
+const hero = document.querySelector(".hero");
+const photo = document.querySelector(".photo-wrapper");
 
+if (hero && photo) {
 
-// ================================
-// ANO AUTOMÁTICO DO FOOTER
-// ================================
+    hero.addEventListener("mousemove", (event) => {
 
-const footerText = document.querySelector(".footer p");
+        const rect = hero.getBoundingClientRect();
 
-if (footerText) {
-    const currentYear = new Date().getFullYear();
+        const x =
+            (event.clientX - rect.left) /
+            rect.width -
+            0.5;
 
-    footerText.innerHTML = `
-        © ${currentYear} Leonardo Godoy. Desenvolvido com 💻 e ☕
-    `;
+        const y =
+            (event.clientY - rect.top) /
+            rect.height -
+            0.5;
+
+        photo.style.transform = `
+            translate(
+                ${x * 12}px,
+                ${y * 12}px
+            )
+        `;
+
+    });
+
+    hero.addEventListener("mouseleave", () => {
+
+        photo.style.transform = "translate(0, 0)";
+
+    });
+
 }
 
 
-// ================================
-// NAVEGAÇÃO SUAVE
-// ================================
+/* ========================================
+   PARALLAX DOS PROJETOS
+======================================== */
 
-const links = document.querySelectorAll('a[href^="#"]');
+const projectImages =
+    document.querySelectorAll(".project-image");
 
-links.forEach((link) => {
+projectImages.forEach((image) => {
+
+    image.addEventListener("mousemove", (event) => {
+
+        const rect = image.getBoundingClientRect();
+
+        const x =
+            (event.clientX - rect.left) /
+            rect.width -
+            0.5;
+
+        const y =
+            (event.clientY - rect.top) /
+            rect.height -
+            0.5;
+
+        const img = image.querySelector("img");
+
+        if (img) {
+
+            img.style.transform = `
+                scale(1.04)
+                translate(
+                    ${x * 8}px,
+                    ${y * 8}px
+                )
+            `;
+
+        }
+
+    });
+
+
+    image.addEventListener("mouseleave", () => {
+
+        const img = image.querySelector("img");
+
+        if (img) {
+            img.style.transform = "scale(1)";
+        }
+
+    });
+
+});
+
+
+/* ========================================
+   NAVEGAÇÃO SUAVE
+======================================== */
+
+document.querySelectorAll('a[href^="#"]').forEach((link) => {
+
     link.addEventListener("click", (event) => {
 
-        const targetId = link.getAttribute("href");
+        const targetId =
+            link.getAttribute("href");
 
-        if (targetId === "#") return;
+        if (targetId === "#") {
+            return;
+        }
 
-        const target = document.querySelector(targetId);
+        const target =
+            document.querySelector(targetId);
 
         if (target) {
+
             event.preventDefault();
 
             target.scrollIntoView({
                 behavior: "smooth",
                 block: "start"
             });
+
         }
+
     });
+
 });
 
+
+/* ========================================
+   ANO AUTOMÁTICO
+======================================== */
+
+const year =
+    document.querySelector(".footer p");
+
+if (year) {
+
+    year.textContent =
+        `© ${new Date().getFullYear()} Leonardo Godoy`;
+
+}
